@@ -1,43 +1,38 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { Tabs } from "expo-router";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+export default function RootLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
+    <Tabs screenOptions={{
+      headerStyle: { backgroundColor: "#f1f5f9"},
+      headerShadowVisible: false,
+      tabBarStyle: {
+          backgroundColor: "#f1f5f9",
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+      },
+      tabBarActiveTintColor: "#4b61afff",
+      tabBarInactiveTintColor: "#999797ff"
+    }}>
+      <Tabs.Screen 
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Home",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 name="house" size={22} color={color} />
+          ),
+          headerShown: false
         }}
       />
-      <Tabs.Screen
-        name="explore"
+      <Tabs.Screen 
+        name="manage"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Manage",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 name="dragon" size={22} color={color} />
+          ),
+          headerShown: false
         }}
       />
     </Tabs>

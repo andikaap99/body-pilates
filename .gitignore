@@ -1,39 +1,66 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+# OS
+.DS_Store
+Thumbs.db
 
-# dependencies
+# Node / logs / cache
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+*.log
+node_modules/.cache/
+.metro-cache/
 
 # Expo
 .expo/
+.expo-shared/
+.expo-env.local
 dist/
 web-build/
-expo-env.d.ts
+build/
 
-# Native
-.kotlin/
-*.orig.*
+# Env & secrets
+.env
+.env.*
+!.env.example
+app.config.local.*
+google-services.json
+GoogleService-Info.plist
+firebase_app_id_file.json
+*.keystore
+*.keystore.properties
 *.jks
 *.p8
 *.p12
-*.key
-*.mobileprovision
-
-# Metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macOS
-.DS_Store
 *.pem
+*.cer
+*.key
 
-# local env files
-.env*.local
+# Android
+android/.gradle/
+android/.idea/
+android/local.properties
+android/build/
+android/app/build/
 
-# typescript
-*.tsbuildinfo
+# iOS
+ios/build/
+ios/Pods/
+ios/*.xcworkspace/
+ios/*.xcodeproj/xcuserdata/
+DerivedData/
 
-app-example
+# Build artifacts (EAS / local builds)
+*.apk
+*.aab
+*.ipa
+*.app.dSYM.zip
+*.map
+*.tar.gz
+coverage/
+
+# Editors
+.vscode/
+.idea/
