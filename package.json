@@ -1,5 +1,5 @@
 {
-  "name": "blubblubfishyeat",
+  "name": "body-pilates",
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
@@ -9,21 +9,21 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "1.24.0",
+    "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-native-community/datetimepicker": "8.4.4",
     "expo": "54.0.7",
     "expo-linear-gradient": "~15.0.7",
     "expo-router": "~6.0.4",
     "expo-splash-screen": "~31.0.10",
-    "firebase": "^12.2.1",
+    "firebase": "^12.5.0",
     "nativewind": "^4.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-native": "0.81.4",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-reanimated": "~4.1.0",
-    "tailwindcss": "^3.3.2",
-    "react-native-safe-area-context": "~5.6.0"
+    "react-native-safe-area-context": "~5.6.0",
+    "tailwindcss": "^3.3.2"
   },
   "devDependencies": {
     "--legacy-peer-deps": "^0.0.1-security.6",

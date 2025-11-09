@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "BlubBlubFishyEat",
-    "slug": "BlubBlubFishyEat",
+    "name": "Body Pilates",
+    "slug": "body-pilates",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "blubblubfishyeat",
+    "scheme": "body-pilates",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

@@ -1,7 +1,7 @@
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { Tabs } from "expo-router";
+import { Tabs } from 'expo-router';
 
-export default function RootLayout() {
+export default function MemberLayout() {
   return (
     <Tabs screenOptions={{
       headerStyle: { backgroundColor: "#f1f5f9"},
