@@ -75,15 +75,25 @@ export default function MemberClassDetail() {
   const onPay = async () => {
     try {
       if (!id) return;
+      if (!auth.currentUser) {
+        Alert.alert('Auth', 'Silakan login ulang.');
+        return;
+      }
       const baseUrl = process.env.EXPO_PUBLIC_PAYMENTS_URL;
       if (!baseUrl) {
         Alert.alert('Config', 'EXPO_PUBLIC_PAYMENTS_URL belum diset.');
         return;
       }
-
+      
       // tentukan harga (fallback 50000 kalau belum ada di data kelas)
-      const amount = Number(klass?.price ?? 50000);
-      const orderId = `cls_${id}_${Date.now()}`;
+      const amount = Math.round(Number(klass?.price ?? 50000));
+
+      // gunakan id dari route sebagai classId
+      const classId = String(id);
+      const uid = auth.currentUser.uid;
+
+      // 🔧 PENTING: orderId pakai UNDERSCORE agar cocok dengan parser webhook (split('_'))
+      const orderId = `cls-${classId.slice(0,8)}-${uid.slice(-6)}-${Date.now().toString(36)}`;
 
       setPaying(true);
       const resp = await fetch(`${baseUrl}/create-transaction`, {
@@ -97,9 +107,10 @@ export default function MemberClassDetail() {
             email: custEmail || 'member@example.com',
           },
           items: [
-            { id: String(id), price: amount, quantity: 1, name: klass?.title ?? 'Pilates Class' },
+            { id: classId, price: amount, quantity: 1, name: klass?.title ?? 'Pilates Class' },
           ],
-          // kalau mau QRIS only di server: enabled_payments: ['qris']
+          // kirim identitas yang dibutuhkan webhook:
+          meta: { classId, uid: auth.currentUser!.uid },
         }),
       });
 
