@@ -1,18 +1,25 @@
 // app/(member)/classes/[id].tsx
-import { router, useLocalSearchParams, useNavigation } from 'expo-router';
-import { onValue, ref } from 'firebase/database';
-import { doc, getDoc } from 'firebase/firestore';
-import React from 'react';
-import { ActivityIndicator, Alert, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
-import { auth, db, dbRT } from '../../../FirebaseConfig';
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { onValue, ref } from "firebase/database";
+import { doc, getDoc } from "firebase/firestore";
+import React from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { auth, db, dbRT } from "../../../FirebaseConfig";
 
 type ClassData = {
   title?: string;
-  date?: string;   // YYYY-MM-DD
-  time?: string;   // HH:MM
+  date?: string; // YYYY-MM-DD
+  time?: string; // HH:MM
   slots?: number;
   participantsCount?: number;
-  price?: number;  // optional: kalau belum ada, kita fallback
+  price?: number; // optional: kalau belum ada, kita fallback
 };
 
 export default function MemberClassDetail() {
@@ -20,15 +27,16 @@ export default function MemberClassDetail() {
   const nav = useNavigation();
 
   const [loading, setLoading] = React.useState(true);
-  const [klass, setKlass]   = React.useState<ClassData | null>(null);
+  const [klass, setKlass] = React.useState<ClassData | null>(null);
   const [paying, setPaying] = React.useState(false);
 
   // state profil user untuk payment
-  const [custName, setCustName]   = React.useState<string>('Member');
-  const [custEmail, setCustEmail] = React.useState<string>('member@example.com');
+  const [custName, setCustName] = React.useState<string>("Member");
+  const [custEmail, setCustEmail] =
+    React.useState<string>("member@example.com");
 
   React.useLayoutEffect(() => {
-    nav.setOptions({ headerShown: true, headerTitle: 'Detail Kelas' });
+    nav.setOptions({ headerShown: true, headerTitle: "Detail Kelas" });
   }, [nav]);
 
   // Ambil data kelas
@@ -52,19 +60,19 @@ export default function MemberClassDetail() {
     if (!u) return;
 
     // default dari auth
-    const authName  = u.displayName || 'Member';
-    const authEmail = u.email || 'member@example.com';
+    const authName = u.displayName || "Member";
+    const authEmail = u.email || "member@example.com";
     setCustName(authName);
     setCustEmail(authEmail);
 
     // coba override dari Firestore users/{uid} jika ada
     (async () => {
       try {
-        const snap = await getDoc(doc(db, 'users', u.uid));
+        const snap = await getDoc(doc(db, "users", u.uid));
         if (snap.exists()) {
           const d = snap.data() as any;
-          if (d?.name && typeof d.name === 'string') setCustName(d.name);
-          if (d?.email && typeof d.email === 'string') setCustEmail(d.email);
+          if (d?.name && typeof d.name === "string") setCustName(d.name);
+          if (d?.email && typeof d.email === "string") setCustEmail(d.email);
         }
       } catch {
         // diamkan saja: fallback tetap pakai nilai dari auth
@@ -76,15 +84,15 @@ export default function MemberClassDetail() {
     try {
       if (!id) return;
       if (!auth.currentUser) {
-        Alert.alert('Auth', 'Silakan login ulang.');
+        Alert.alert("Auth", "Silakan login ulang.");
         return;
       }
       const baseUrl = process.env.EXPO_PUBLIC_PAYMENTS_URL;
       if (!baseUrl) {
-        Alert.alert('Config', 'EXPO_PUBLIC_PAYMENTS_URL belum diset.');
+        Alert.alert("Config", "EXPO_PUBLIC_PAYMENTS_URL belum diset.");
         return;
       }
-      
+
       // tentukan harga (fallback 50000 kalau belum ada di data kelas)
       const amount = Math.round(Number(klass?.price ?? 50000));
 
@@ -93,21 +101,28 @@ export default function MemberClassDetail() {
       const uid = auth.currentUser.uid;
 
       // 🔧 PENTING: orderId pakai UNDERSCORE agar cocok dengan parser webhook (split('_'))
-      const orderId = `cls-${classId.slice(0,8)}-${uid.slice(-6)}-${Date.now().toString(36)}`;
+      const orderId = `cls_${classId.slice(0, 8)}_${uid.slice(
+        -6
+      )}_${Date.now().toString(36)}`;
 
       setPaying(true);
       const resp = await fetch(`${baseUrl}/create-transaction`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId,
           amount,
           customer: {
-            firstName: custName || 'Member',
-            email: custEmail || 'member@example.com',
+            firstName: custName || "Member",
+            email: custEmail || "member@example.com",
           },
           items: [
-            { id: classId, price: amount, quantity: 1, name: klass?.title ?? 'Pilates Class' },
+            {
+              id: classId,
+              price: amount,
+              quantity: 1,
+              name: klass?.title ?? "Pilates Class",
+            },
           ],
           // kirim identitas yang dibutuhkan webhook:
           meta: { classId, uid: auth.currentUser!.uid },
@@ -117,15 +132,24 @@ export default function MemberClassDetail() {
       // robust parsing (biar errornya jelas kalau bukan JSON)
       const text = await resp.text();
       let json: any = null;
-      try { json = JSON.parse(text); } catch { /* ignore */ }
-
-      if (!resp.ok || !json?.redirectUrl) {
-        throw new Error(json?.error || `Gagal membuat transaksi (status ${resp.status}).`);
+      try {
+        json = JSON.parse(text);
+      } catch {
+        /* ignore */
       }
 
-      router.push({ pathname: '/(member)/pay', params: { url: json.redirectUrl, orderId } });
+      if (!resp.ok || !json?.redirectUrl) {
+        throw new Error(
+          json?.error || `Gagal membuat transaksi (status ${resp.status}).`
+        );
+      }
+
+      router.push({
+        pathname: "/(member)/pay",
+        params: { url: json.redirectUrl, orderId },
+      });
     } catch (e: any) {
-      Alert.alert('Pembayaran', e?.message ?? 'Gagal membuat transaksi.');
+      Alert.alert("Pembayaran", e?.message ?? "Gagal membuat transaksi.");
     } finally {
       setPaying(false);
     }
@@ -145,15 +169,29 @@ export default function MemberClassDetail() {
     <SafeAreaView className="flex-1 bg-slate-50">
       <View className="p-5">
         <View className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-          <Text className="text-2xl font-bold">{klass?.title ?? '-'}</Text>
+          <Text className="text-2xl font-bold">{klass?.title ?? "-"}</Text>
 
           <View className="mt-3 gap-1">
             <Text className="text-slate-700">
-              Slot: <Text className="font-semibold">{klass?.participantsCount ?? 0}/{klass?.slots ?? 0}</Text>
+              Slot:{" "}
+              <Text className="font-semibold">
+                {klass?.participantsCount ?? 0}/{klass?.slots ?? 0}
+              </Text>
             </Text>
-            <Text className="text-slate-700">Tanggal: <Text className="font-semibold">{klass?.date ?? '-'}</Text></Text>
-            <Text className="text-slate-700">Jam: <Text className="font-semibold">{klass?.time ?? '-'}</Text> WIB</Text>
-            <Text className="text-slate-700">Harga: <Text className="font-semibold">Rp {(klass?.price ?? 50000).toLocaleString('id-ID')}</Text></Text>
+            <Text className="text-slate-700">
+              Tanggal:{" "}
+              <Text className="font-semibold">{klass?.date ?? "-"}</Text>
+            </Text>
+            <Text className="text-slate-700">
+              Jam: <Text className="font-semibold">{klass?.time ?? "-"}</Text>{" "}
+              WIB
+            </Text>
+            <Text className="text-slate-700">
+              Harga:{" "}
+              <Text className="font-semibold">
+                Rp {(klass?.price ?? 50000).toLocaleString("id-ID")}
+              </Text>
+            </Text>
           </View>
 
           <TouchableOpacity
@@ -163,7 +201,7 @@ export default function MemberClassDetail() {
             className="mt-5 h-12 rounded-2xl items-center justify-center bg-indigo-600"
           >
             <Text className="text-white font-semibold">
-              {paying ? 'Membuat Transaksi…' : 'Daftar & Bayar'}
+              {paying ? "Membuat Transaksi…" : "Daftar & Bayar"}
             </Text>
           </TouchableOpacity>
         </View>
